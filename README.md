@@ -14,15 +14,22 @@ Le email **non vengono inviate realmente**: il contenuto (link di conferma, codi
 ## Stack tecnico
 
 - Java 21, Spring Boot 4.1.1 (Web, Data JPA, Security, Validation)
-- MySQL (driver `mysql-connector-j`)
+- PostgreSQL (driver `postgresql`)
 - JWT (`jjwt` 0.12.6) per l'autenticazione stateless
 - Lombok
 - Maven (con Maven Wrapper incluso, non serve installare Maven)
 
 ## Setup
 
-1. Avvia un server MySQL in locale (porta 3306).
-2. Apri `src/main/resources/application.properties` e imposta `spring.datasource.username` / `spring.datasource.password` con le tue credenziali. Il database `bankapp` viene creato automaticamente al primo avvio (`createDatabaseIfNotExist=true`), così come le tabelle (`spring.jpa.hibernate.ddl-auto=update`).
+1. Serve un server PostgreSQL in locale (porta 5432). A differenza di MySQL, Postgres
+   **non crea da solo** il database: va creato una volta sola con `psql` (o pgAdmin):
+
+   ```powershell
+   & "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -c "CREATE DATABASE bankapp;"
+   ```
+   (ti verrà chiesta la password dell'utente `postgres` scelta durante l'installazione).
+
+2. Apri `src/main/resources/application.properties` e imposta `spring.datasource.username` / `spring.datasource.password` con le tue credenziali reali (di default punta a `postgres`/`postgres`). Le tabelle vengono create/aggiornate automaticamente al primo avvio (`spring.jpa.hibernate.ddl-auto=update`).
 3. Avvia l'applicazione:
 
    ```powershell
@@ -117,6 +124,14 @@ GET /api/account/me   (autenticato)
 ```
 Restituisce email, nome completo e saldo corrente — utile per verificare che i bonifici
 abbiano spostato davvero il denaro.
+
+## Come testare
+
+Il backend è puramente REST (nessuna pagina HTML), quindi va chiamato con un client
+HTTP. Postman va benissimo, ma non è obbligatorio: bastano `curl`/`Invoke-RestMethod`,
+o direttamente dentro VS Code con l'estensione **REST Client** (file `.http`) o
+**Thunder Client** — utile se vuoi tenere backend e test nello stesso editor in cui
+farai il frontend.
 
 ## Note
 
